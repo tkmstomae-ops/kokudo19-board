@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>R19</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --border: #1f2933;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+      --radius: 10px;
+      --space: 16px;
+      --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Helvetica Neue", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 0 auto 16px;
+    }
+
+    .title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-badge {
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .notice {
+      margin-top: 10px;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      border-radius: var(--radius);
+      background: rgba(248, 250, 252, 0.03);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      line-height: 1.6;
+    }
+
+    .notice strong {
+      color: #facc15;
+    }
+
+    .notice ul {
+      padding-left: 1.1em;
+      margin: 6px 0 0;
+    }
+
+    .notice li {
+      margin: 2px 0;
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #111827 0, #020617 70%);
+      border-radius: var(--radius);
+      padding: var(--space);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title-tag {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.2);
+      border: 1px solid rgba(45, 212, 191, 0.5);
+      color: #a5f3fc;
+    }
+
+    .card-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .field-group {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+        
+    /* Xセクションだけ少し小さめにする */
+    .card.mlit-card {
+        padding: 1rem 1.25rem;
+        min-height: auto;
+    }
+
+    .card.mlit-card .mlit-frame-wrap {
+        padding: 0.3rem 0.2rem;
+    }
+
+    @media (max-width: 900px) {
+      .field-group {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    label {
+      font-size: 0.78rem;
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 7px;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      background-color: rgba(15, 23, 42, 0.8);
+      color: var(--text);
+      font-size: 0.86rem;
+      outline: none;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #6b7280;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.5;
+      margin-top: 2px;
+    }
+
+    .help-text {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .status-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+    }
+
+    .chip span {
+      margin-right: 3px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .button-primary {
+      border: none;
+      border-radius: 999px;
+      padding: 7px 16px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #22c55e, #0ea5e9);
+      color: #f9fafb;
+      box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .button-primary:hover {
+      opacity: 0.95;
+    }
+
+    .button-primary span {
+      font-size: 1.1rem;
+    }
+
+    .posts-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .post-empty {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 36px 0;
+    }
+
+    .post {
+      padding: 10px 11px;
+      border-radius: 9px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.86rem;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      font-size: 0.8rem;
+    }
+
+    .post-main {
+      white-space: pre-wrap;
+    }
+
+    .post-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 0.75rem;
+    }
+
+    .meta-pill {
+      border-radius: 999px;
+      padding: 2px 7px;
+      background: rgba(30, 64, 175, 0.4);
+      color: #bfdbfe;
+    }
+
+    .meta-pill.section {
+      background: rgba(6, 95, 70, 0.5);
+      color: #a7f3d0;
+    }
+
+    .meta-pill.status-normal {
+      background: rgba(22, 163, 74, 0.4);
+      color: #bbf7d0;
+    }
+
+    .meta-pill.status-warning {
+      background: rgba(234, 179, 8, 0.4);
+      color: #fef9c3;
+    }
+
+    .meta-pill.status-danger {
+      background: rgba(220, 38, 38, 0.5);
+      color: #fecaca;
+    }
+
+    .meta-pill.status-ice {
+      background: rgba(56, 189, 248, 0.4);
+      color: #e0f2fe;
+    }
+
+    .mlit-card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mlit-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .mlit-frame-wrap {
+      flex: 1;
+      min-height: 350px;
+      border-radius: 9px;
+      overflow: hidden;
+      background: #020617;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .mlit-frame-wrap-inner {
+      height: 100%;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">
+      <span>帰ってきたR19</span>
+      <span class="title-badge">BETA / 個人運営</span>
+    </div>
+    <p class="subtitle">
+      国道19号の「いま」を共有するための掲示板です。
+    </p>
+    <div class="notice">
+      <strong>⚠ ご注意</strong><br />
+      このサイトは個人が運営する<strong>非公式</strong>の情報共有サイトです。投稿内容はあくまで利用者個人の体験・印象であり、
+      国土交通省・長野県・市町村などの<strong>公式な道路情報ではありません</strong>。<br />
+      最新かつ正確な通行情報は、必ず公式の道路情報や自治体・国の発表をご確認ください。<br />
+      <ul>
+        <li>個人名・車両ナンバーなどの特定につながる内容は書き込まないでください。</li>
+        <li>誹謗中傷・差別的表現など、公序良俗に反する投稿は管理人が削除する場合があります。</li>
+      </ul>
+    </div>
+  </header>
+
+        <main class="page">
+
+            <!-- ① 投稿セクション（フォーム） -->
+            <section class="card">
+                <div class="card-header">
+                <div class="card-title">
+                    匿名で投稿する
+                    <span class="card-title-tag">ニックネームのみ</span>
+                </div>
+                <div class="card-sub">新しい投稿が上に表示されます</div>
+                </div>
+
+                <!-- 投稿フォーム -->
+                <form id="post-form">
+                <div class="field-group">
+                    <div>
+                    <label for="nickname">ニックネーム *</label>
+                    <input
+                        type="text"
+                        id="nickname"
+                        name="nickname"
+                        placeholder="例：木曽のドライバー"
+                        required
+                    />
+                    </div>
+                    <div>
+                    <label for="section">区間（任意）</label>
+                    <select id="section" name="section">
+                        <option value="">選択しない</option>
+                        <option value="塩尻〜木曽福島">塩尻 ⇄ 木曽福島</option>
+                        <option value="木曽福島〜大桑村">木曽福島 ⇄ 大桑村</option>
+                        <option value="大桑村〜中津川">大桑村 ⇄ 中津川</option>
+                        <option value="その他">その他</option>
+                    </select>
+                    </div>
+                    <div>
+                    <label for="status">状況（任意）</label>
+                    <select id="status" name="status">
+                        <option value="">選択しない</option>
+                        <option value="通常">🟢 通常</option>
+                        <option value="渋滞">🟡 渋滞</option>
+                        <option value="事故">🔴 事故・車両トラブル</option>
+                        <option value="通行止め">⛔ 通行止め</option>
+                        <option value="凍結">❄ 路面凍結・積雪</option>
+                    </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="body">道路状況のようす *</label>
+                    <textarea
+                    id="body"
+                    name="body"
+                    maxlength="280"
+                    placeholder="例：11/14 19時ごろ、大桑→中津川 上り。阿寺トンネル手前で工事のため片側交互通行。5分ほどの待ち時間でした。"
+                    required
+                    ></textarea>
+                </div>
+
+                <div class="status-chips">
+                    <div class="chip"><span>🟢</span>通常</div>
+                    <div class="chip"><span>🟡</span>渋滞</div>
+                    <div class="chip"><span>🔴</span>事故/トラブル</div>
+                    <div class="chip"><span>⛔</span>通行止め</div>
+                    <div class="chip"><span>❄</span>凍結/積雪</div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="button-primary">
+                    <span>➤</span>
+                    投稿する
+                    </button>
+                </div>
+                </form>
+            </section>
+
+            <!-- ② みんなの投稿 -->
+            <section class="card" aria-label="投稿一覧">
+                <div class="card-header">
+                <div class="card-title">みんなの投稿</div>
+                <div class="card-sub">最新の投稿が上に表示されます</div>
+                </div>
+
+                <ul id="posts-list" class="posts-list">
+                <li class="post-empty">
+                    まだ投稿はありません。最初の道路状況を教えてください 🚗
+                </li>
+                </ul>
+            </section>
+
+            <!-- ③ 飯田国道事務所 Xリンク（中身はそのまま） -->
+            <section class="card mlit-card">
+                <div class="card-header">
+                <div class="card-title">
+                    国土交通省 飯田国道事務所 X（旧Twitter）
+                </div>
+                </div>
+
+                <p class="mlit-note">
+                公式の通行情報・規制・注意喚起などは、必ずこちらの公式アカウントの情報もあわせてご確認ください。
+                </p>
+
+                <a
+                href="https://x.com/mlit_iida"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.4rem;
+                    padding: 0.55rem 1.5rem;
+                    border-radius: 999px;
+                    background: #1d9bf0;
+                    color: #ffffff;
+                    font-size: 0.9rem;
+                    text-decoration: none;
+                    width: fit-content;
+                    margin: 0.75rem auto 0;
+                "
+                >
+                公式X（@mlit_iida）を開く
+                <span style="font-size: 0.9rem;">↗</span>
+                </a>
+            </section>
+
+        </main>
+
+
+    <!-- Supabase クライアント（CDN版） -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    // ★ 自分のプロジェクトURLと anon key をセット
+    const SUPABASE_URL = "https://xsexclpcwikibafthpax.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzZXhjbHBjd2lraWJhZnRocGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMTU5MzcsImV4cCI6MjA3ODY5MTkzN30.ailIkdZH6HWFNZJX8dhXbdg89rx23L1C3yzRDKAeTqM";
+
+    const supabase = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    // ★ 投稿間隔（ミリ秒）: 今回は 1分 = 60000ms
+    const POST_INTERVAL_MS = 60 * 1000;
+    const form = document.getElementById("post-form");
+    const postsList = document.getElementById("posts-list");
+
+    // 日付表示を日本時間で少しきれいに整える
+    function formatDate(dt) {
+      if (!dt) return "";
+      const d = new Date(dt);
+      return d.toLocaleString("ja-JP", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Asia/Tokyo",
+      });
+    }
+
+    // 取得した投稿をHTMLとして描画する
+    function renderPosts(posts) {
+      postsList.innerHTML = "";
+
+      if (!posts || posts.length === 0) {
+        const li = document.createElement("li");
+        li.className = "post-empty";
+        li.textContent = "まだ投稿はありません。最初の道路状況を教えてください 🚗";
+        postsList.appendChild(li);
+        return;
+      }
+
+      for (const post of posts) {
+        const li = document.createElement("li");
+        li.className = "post";
+
+        // ステータス用のクラス振り分け
+        let statusClass = "meta-pill";
+        if (post.status === "通常") statusClass += " status-normal";
+        else if (post.status === "渋滞") statusClass += " status-warning";
+        else if (post.status === "事故") statusClass += " status-danger";
+        else if (post.status === "通行止め") statusClass += " status-danger";
+        else if (post.status === "凍結") statusClass += " status-ice";
+
+        li.innerHTML = `
+          <div class="post-header">
+            <div><strong>${post.nickname || "ななし"}</strong></div>
+            <div style="font-size:0.75rem; color:#9ca3af;">
+              ${formatDate(post.created_at)}
+            </div>
+          </div>
+          <div class="post-main">${post.body || ""}</div>
+          <div class="post-meta">
+            ${
+              post.section
+                ? `<span class="meta-pill section">${post.section}</span>`
+                : ""
+            }
+            ${
+              post.status
+                ? `<span class="${statusClass}">${post.status}</span>`
+                : ""
+            }
+          </div>
+        `;
+
+        postsList.appendChild(li);
+      }
+    }
+
+    // Supabase から最新の投稿を取得する
+    async function fetchPosts() {
+      const { data, error } = await supabase
+            .from("posts")
+            .select("*")
+            .eq("hidden", false) // ★ hidden=false のものだけ
+            .order("created_at", { ascending: false })
+            .limit(50);// とりあえず最新50件
+
+      if (error) {
+        console.error("取得エラー:", error);
+        return;
+      }
+
+      renderPosts(data);
+    }
+
+    // フォーム送信 → Supabaseに保存 → 一覧を再取得
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // 直近の投稿から1分経っているかチェック
+      const now = Date.now();
+      const lastPostAt = Number(localStorage.getItem("lastPostAt") || 0);
+      const diff = now - lastPostAt;
+
+      if (diff < POST_INTERVAL_MS) {
+        const restSec = Math.ceil((POST_INTERVAL_MS - diff) / 1000);
+        alert(`連続投稿は1分に1回までです。あと ${restSec} 秒お待ちください。`);
+        return;
+      }
+
+      const nickname = form.nickname.value.trim();
+      const section = form.section.value || null;
+      const status = form.status.value || null;
+      const body = form.body.value.trim();
+
+      if (!nickname || !body) {
+        alert("ニックネームと道路状況のようすは必須です。");
+        return;
+      }
+
+      const submitButton = form.querySelector("button[type='submit']");
+      submitButton.disabled = true;
+      submitButton.textContent = "送信中...";
+
+      const { error } = await supabase.from("posts").insert([
+        {
+          nickname,
+          section,
+          status,
+          body,
+        },
+      ]);
+
+      submitButton.disabled = false;
+      submitButton.textContent = "投稿する";
+
+      if (error) {
+        console.error("投稿エラー:", error);
+        alert("投稿の保存に失敗しました。時間をおいてもう一度お試しください。");
+        return;
+      }
+
+      // 投稿が成功したら「最後の投稿時間」を記録
+      localStorage.setItem("lastPostAt", String(Date.now()));
+
+      form.reset();
+      alert("投稿を保存しました！");
+
+      // 新しい投稿を反映
+      fetchPosts();
+    });
+
+
+    // ページ読み込み時に最新投稿を取得
+    fetchPosts();
+  </script>
+</body>
+</html>
