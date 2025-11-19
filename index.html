@@ -376,6 +376,7 @@
       <ul>
         <li>個人名・車両ナンバーなどの特定につながる内容は書き込まないでください。</li>
         <li>誹謗中傷・差別的表現など、公序良俗に反する投稿は管理人が削除する場合があります。</li>
+        <li>一部のブラウザでは投稿できない場合があります。その場合は別のブラウザからお試しください。</li>
       </ul>
     </div>
   </header>
@@ -619,7 +620,7 @@
             .select("*")
             .eq("hidden", false) // ★ hidden=false のものだけ
             .order("created_at", { ascending: false })
-            .limit(50);// とりあえず最新50件
+            .limit(20);// とりあえず最新20件
 
       if (error) {
         console.error("取得エラー:", error);
@@ -634,8 +635,16 @@
       e.preventDefault();
 
       // 直近の投稿から1分経っているかチェック
-      const now = Date.now();
-      const lastPostAt = Number(localStorage.getItem("lastPostAt") || 0);
+          const now = Date.now();
+          let lastPostAt = 0;
+
+          try {
+            lastPostAt = Number(localStorage.getItem("lastPostAt") || 0);
+          } catch (e) {
+            console.warn("localStorageが使えない環境のようです:", e);
+            // ここでは lastPostAt = 0 のまま進める（連投制限は効かないが投稿はできる）
+          }
+
       const diff = now - lastPostAt;
 
       if (diff < POST_INTERVAL_MS) {
@@ -667,17 +676,28 @@
         },
       ]);
 
-      submitButton.disabled = false;
-      submitButton.textContent = "投稿する";
+        submitButton.disabled = false;
+        submitButton.textContent = "投稿する";
 
-      if (error) {
-        console.error("投稿エラー:", error);
-        alert("投稿の保存に失敗しました。時間をおいてもう一度お試しください。");
-        return;
-      }
+        if (error) {
+          console.error("投稿エラー:", error);
+          alert(
+            "投稿の保存に失敗しました。\n\n" +
+              "エラー内容: " +
+              (error.message || "詳細不明") +
+              "\n\n" +
+              "改善しない場合は、ブラウザを変えるか、管理人にこの画面の内容をお知らせください。"
+          );
+          return;
+        }
+
 
       // 投稿が成功したら「最後の投稿時間」を記録
-      localStorage.setItem("lastPostAt", String(Date.now()));
+          try {
+                localStorage.setItem("lastPostAt", String(Date.now()));
+                } catch (e) {
+                console.warn("localStorageに保存できませんでした:", e);
+              }
 
       form.reset();
       alert("投稿を保存しました！");
