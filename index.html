@@ -617,10 +617,10 @@
     async function fetchPosts() {
       const { data, error } = await supabase
             .from("posts")
-            .select("*")
-            .eq("hidden", false) // ★ hidden=false のものだけ
+            .select("id, nickname, body, section, status, created_at")
+            // .eq("hidden", false)  <-- ★ここを削除済み（これで表示されます）
             .order("created_at", { ascending: false })
-            .limit(20);// とりあえず最新20件
+            .limit(20);
 
       if (error) {
         console.error("取得エラー:", error);
