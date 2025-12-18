@@ -540,7 +540,8 @@
     const SUPABASE_URL = "https://xsexclpcwikibafthpax.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzZXhjbHBjd2lraWJhZnRocGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMTU5MzcsImV4cCI6MjA3ODY5MTkzN30.ailIkdZH6HWFNZJX8dhXbdg89rx23L1C3yzRDKAeTqM";
 
-    const supabase = window.supabase.createClient(
+    // ★★★ ここを変更しました（変数名を supabaseClient に） ★★★
+    const supabaseClient = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_ANON_KEY
     );
@@ -615,10 +616,11 @@
 
     // Supabase から最新の投稿を取得する
     async function fetchPosts() {
-      const { data, error } = await supabase
+      // ★ ここも変数名を修正
+      const { data, error } = await supabaseClient
             .from("posts")
             .select("id, nickname, body, section, status, created_at")
-            // .eq("hidden", false)  <-- ★ここを削除済み（これで表示されます）
+            // .eq("hidden", false) <-- 削除済み
             .order("created_at", { ascending: false })
             .limit(20);
 
@@ -634,16 +636,13 @@
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // 直近の投稿から1分経っているかチェック
-          const now = Date.now();
-          let lastPostAt = 0;
-
-          try {
-            lastPostAt = Number(localStorage.getItem("lastPostAt") || 0);
-          } catch (e) {
-            console.warn("localStorageが使えない環境のようです:", e);
-            // ここでは lastPostAt = 0 のまま進める（連投制限は効かないが投稿はできる）
-          }
+      const now = Date.now();
+      let lastPostAt = 0;
+      try {
+        lastPostAt = Number(localStorage.getItem("lastPostAt") || 0);
+      } catch (e) {
+        console.warn("localStorageが使えない環境のようです:", e);
+      }
 
       const diff = now - lastPostAt;
 
@@ -667,7 +666,8 @@
       submitButton.disabled = true;
       submitButton.textContent = "送信中...";
 
-      const { error } = await supabase.from("posts").insert([
+      // ★ ここも変数名を修正
+      const { error } = await supabaseClient.from("posts").insert([
         {
           nickname,
           section,
@@ -691,23 +691,17 @@
           return;
         }
 
-
-      // 投稿が成功したら「最後の投稿時間」を記録
-          try {
-                localStorage.setItem("lastPostAt", String(Date.now()));
-                } catch (e) {
-                console.warn("localStorageに保存できませんでした:", e);
-              }
+      try {
+        localStorage.setItem("lastPostAt", String(Date.now()));
+      } catch (e) {
+        console.warn("localStorageに保存できませんでした:", e);
+      }
 
       form.reset();
       alert("投稿を保存しました！");
-
-      // 新しい投稿を反映
       fetchPosts();
     });
 
-
-    // ページ読み込み時に最新投稿を取得
     fetchPosts();
   </script>
 </body>
