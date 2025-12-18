@@ -620,12 +620,14 @@
       const { data, error } = await supabaseClient
             .from("posts")
             .select("id, nickname, body, section, status, created_at")
-            // .eq("hidden", false) <-- 削除済み
+            .eq("hidden", false)
             .order("created_at", { ascending: false })
             .limit(20);
 
       if (error) {
         console.error("取得エラー:", error);
+        // エラー内容を画面で確認できるように、alertを追加しておくと確実です
+        // alert("エラーが発生しました: " + error.message);
         return;
       }
 
